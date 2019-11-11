@@ -1,6 +1,22 @@
 # flutter_mall项目说明
 在入门了Flutter之后,只想说, 真的好方便好好用.....我可能爱上flutter了!
 
+### /lib/Config //配置信息文件夹
+
+..httpConfig.dart //存储http请求配置信息
+
+..viewConfig.dart //存储视图配置信息
+
+### /lib/Request //请求信息
+
+..httpRequest.dart //接口请求信息以及验签方法
+
+### /lib/Account //个人中心模块以及账号登录等页面
+
+### /lib/Home //首页模块
+
+### /lib/News //分类模块
+
 ## 2019-11-10
 花了四天时间学习Flutter,然后准备着手做的第一个项目就是这个商城类APP.
 
