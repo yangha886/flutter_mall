@@ -38,7 +38,7 @@ class _MyAppState extends State<MyApp> {
         bottomNavigationBar: BottomNavigationBar(
           items: [
             BottomNavigationBarItem(icon: Icon(Icons.home),title: Text("9.9包邮")),
-            BottomNavigationBarItem(icon: Icon(Icons.list),title: Text("种草")),
+            BottomNavigationBarItem(icon: Icon(Icons.list),title: Text("分类")),
             BottomNavigationBarItem(icon: Icon(Icons.account_balance),title: Text("我的")),
           ],
           selectedItemColor: Colors.lightBlue,

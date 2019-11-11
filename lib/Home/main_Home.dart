@@ -46,17 +46,12 @@ class _Main_HomeState extends State<Main_Home> {
      catalogueList = cmodels;
     });
   }
-  //好像不能一个组件用两个setstate,会冲突,所以把活动获取接口放到9.9方法里了
-  void getCatalogueListRequest() async{
-    
-  }
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     
     getNDNProductRequest();
-    getCatalogueListRequest();
   }
   @override
   Widget build(BuildContext context) {
@@ -111,21 +106,49 @@ class adBanner extends StatelessWidget {
 }
 //顶部活动页
 class topBanner extends StatelessWidget {
-  final List<String> bannerList = <String>["http://img.zcool.cn/community/01a21d575a17770000018c1bb53779.jpg","http://img.zcool.cn/community/01a21d575a17770000018c1bb53779.jpg","http://img.zcool.cn/community/01a21d575a17770000018c1bb53779.jpg"];
-  
+  //final List<String> bannerList = <String>["http://img.zcool.cn/community/01a21d575a17770000018c1bb53779.jpg","http://img.zcool.cn/community/01a21d575a17770000018c1bb53779.jpg","http://img.zcool.cn/community/01a21d575a17770000018c1bb53779.jpg"];
+  Future<List> getBannerList() async{
+    Map query = {"appKey":prefix0.appkey,"version":"v1.1.0"};
+    var val = await httpRequest().request(prefix0.topBannerPath, query);
+    List rawList = val['data'] as List;
+    return rawList;
+  }
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: ScreenUtil().setHeight(333),
-      width: ScreenUtil().setWidth(750),
-      child: Swiper(
-        itemCount: bannerList.length,
-        itemBuilder: (context,index){
-          return Image.network(bannerList[index],fit: BoxFit.fill,);
-        },
-        pagination: SwiperPagination(),
-        autoplay: true,
-      ),
+    return FutureBuilder(
+      future: getBannerList(),
+      builder: (context,snapshot){
+        if (snapshot.hasData){
+          List bannerList = snapshot.data as List;
+          List bannerItem = [];
+          for (var item in bannerList) {
+            if ((item['banner'] as List).length > 0){
+              bannerItem = item['banner'];
+              break;
+            }
+          }
+          
+          if (bannerItem.length ==0){
+            bannerItem = ["http://img.zcool.cn/community/01a21d575a17770000018c1bb53779.jpg","http://img.zcool.cn/community/01a21d575a17770000018c1bb53779.jpg","http://img.zcool.cn/community/01a21d575a17770000018c1bb53779.jpg"];
+          }
+          return Container(
+            height: ScreenUtil().setHeight(333),
+            width: ScreenUtil().setWidth(750),
+            child: Swiper(
+              itemCount: bannerItem.length,
+              itemBuilder: (context,index){
+                return Image.network(bannerItem[index],fit: BoxFit.fill,);
+              },
+              pagination: SwiperPagination(),
+              autoplay: true,
+            ),
+          );
+        }else{
+           return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+      },
     );
   }
 }
@@ -219,6 +242,9 @@ class catalogInfoNoStateTest extends StatelessWidget {
       builder: (context, snapshot){
         if (snapshot.hasData){
           productList = snapshot.data as List;
+          String imgUrl = fixImgUrl(item['goodsLabel']);
+          String imgdUrl = fixImgUrl(item['detailLabel']);
+          print('单个活动热门');
           return Column(
             children: <Widget>[
               Container(
@@ -226,9 +252,10 @@ class catalogInfoNoStateTest extends StatelessWidget {
                 padding: EdgeInsets.all(1),
                 child: Row(
                   children: <Widget>[
-                    Image.network(item['goodsLabel'],fit: BoxFit.fill,),
+                    
+                    Image.network(imgUrl,fit: BoxFit.fill,),
                     Expanded(
-                      child: Image.network(item['detailLabel'],fit:BoxFit.fill),
+                      child: Image.network(imgdUrl,fit:BoxFit.fill),
                     )
                     
                   ],
@@ -293,12 +320,10 @@ class singleActivityProductView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     
-    String imgString = model.mainPic;
-    //接口会返回//开头的错误图片地址,所以需要修正
-    if (imgString.startsWith("//") == true){
-      imgString = 'https:'+imgString;
-    }
+    String imgString = fixImgUrl(model.mainPic);
+    print('单个活动商品');
     return InkWell(
+      
       onTap: (){},
       child: Container(
         height: ssSetHeigth(330),
@@ -336,12 +361,8 @@ class ndnProductList extends StatelessWidget {
   List<ninedotnineModel> _dataList;
   ndnProductList(this._dataList);
   Widget _ndnProductCell(ninedotnineModel model){
-    String imgString = model.mainPic;
-    String monthSales = model.monthSales.toString();
-    //接口会返回//开头的错误图片地址,所以需要修正
-    if (imgString.startsWith("//") == true){
-      imgString = 'https:'+imgString;
-    }
+    String imgString = fixImgUrl(model.mainPic);
+    String monthSales = fixImgUrl(model.monthSales.toString());
     if (monthSales.length > 3){
       monthSales = "${(model.monthSales/10000).toStringAsFixed(2)}万";
     }
@@ -382,9 +403,9 @@ class ndnProductList extends StatelessWidget {
                   child: Row(
                     children: <Widget>[
                       Expanded(
-                        child: Text('淘宝价:¥${model.originalPrice}',style: TextStyle(decoration: TextDecoration.lineThrough,fontSize: 12,color: Colors.grey[600]),),
+                        child: Text('${model.shopType==0?"淘宝":"天猫"}价:¥${model.originalPrice}',style: TextStyle(decoration: TextDecoration.lineThrough,fontSize: 12,color: Colors.grey[600]),),
                       ),
-                      Text('销量:$monthSales'),
+                      Text('已售$monthSales'),
                     ],
                   ),
                 ),

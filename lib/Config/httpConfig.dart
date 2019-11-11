@@ -1,6 +1,8 @@
 final scheme = "https";
 final host = "openapi.dataoke.com";
 final appkey = "5dc3bcf9a4ef4";
+//topbanner
+final topBannerPath = "/api/goods/topic/catalogue";
 //热门活动
 final cataloguepath = "/api/goods/activity/catalogue";
 //活动商品

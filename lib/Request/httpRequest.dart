@@ -63,3 +63,10 @@ class httpRequest{
     }
   }
 }
+
+String fixImgUrl(String str){
+  if (str.startsWith("//") == true){
+      str = 'https:'+str;
+  }
+  return str;
+}
