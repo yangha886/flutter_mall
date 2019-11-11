@@ -1,5 +1,6 @@
 # flutter_mall项目说明
 在入门了Flutter之后,只想说, 真的好方便好好用.....我可能爱上flutter了!
+
 本人是flutter新手,如果项目中有什么写的不足的地方可以联系我Email:1033839995@qq.com
 
 ### /lib/Config //配置信息文件夹
