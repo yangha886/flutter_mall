@@ -35,6 +35,17 @@
 
 6.分类模块二级页面完成,增加路由(未实现商品列表页面)
 
+## 好用的工具包括插件在这里汇总一下:
+
+网站:
+https://javiercbk.github.io/json_to_dart/  json数据转化成dart语言的model
+
+库:
+url_launcher        支持HTTP/HTTPS/TEL/MAILTO/SMS
+fluro               路由
+provide             状态管理
+flutter_screenutil  屏幕适配
+flutter_swiper      轮播图
 
 ## 碰到的问题记录一下:
 
