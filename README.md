@@ -38,13 +38,20 @@
 ## 好用的工具包括插件在这里汇总一下:
 
 网站:
-https://javiercbk.github.io/json_to_dart/  json数据转化成dart语言的model
+https://javiercbk.github.io/json_to_dart/   json数据转化成dart语言的model
+
+http://www.fluttericon.com/                 flutter的ICON库,可以比较方便的查到对应的ICON NAME
 
 库:
+
 url_launcher        支持HTTP/HTTPS/TEL/MAILTO/SMS
+
 fluro               路由
+
 provide             状态管理
+
 flutter_screenutil  屏幕适配
+
 flutter_swiper      轮播图
 
 ## 碰到的问题记录一下:
