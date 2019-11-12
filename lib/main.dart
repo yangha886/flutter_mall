@@ -4,12 +4,17 @@ import 'package:tkjidi/Account/main_Account.dart';
 import 'package:tkjidi/News/main_News.dart';
 import 'package:provide/provide.dart';
 import 'package:tkjidi/provider/supCategoly.dart';
+import 'package:fluro/fluro.dart';
+import 'package:tkjidi/routes/application.dart';
+import 'package:tkjidi/routes/routes.dart';
+import 'package:tkjidi/provider/productDetailProvider.dart';
 void main(){
   var supcate = SupCategoly();
+  var productDetail = ProductDetailProvider();
   var provi = Providers();
   provi
-  ..provide(Provider<SupCategoly>.value(supcate));
-
+  ..provide(Provider<SupCategoly>.value(supcate))
+  ..provide(Provider<ProductDetailProvider>.value(productDetail));
   runApp(ProviderNode(child: MyApp(), providers: provi,));
 }
 
@@ -30,8 +35,12 @@ class _MyAppState extends State<MyApp> {
   }
   @override
   Widget build(BuildContext context) {
-    
+    final route = Router();
+    Routes.configuerRoutes(route);
+    Application.router = route;
+
     return MaterialApp(
+      onGenerateRoute: Application.router.generator,
       home: Scaffold(
         
         body: _list.elementAt(selectIndex),

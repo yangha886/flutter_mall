@@ -1,41 +1,36 @@
-class ninedotnineModel {
+class guessLikeListModel {
   int time;
   int code;
   String msg;
-  Data data;
+  List<guessLikeInfoModel> data;
 
-  ninedotnineModel({this.time, this.code, this.msg, this.data});
+  guessLikeListModel({this.time, this.code, this.msg, this.data});
 
-  ninedotnineModel.fromJson(Map<String, dynamic> json) {
+  guessLikeListModel.fromJson(Map<String, dynamic> json) {
     time = json['time'];
     code = json['code'];
     msg = json['msg'];
-    data = json['data'] != null ? new Data.fromJson(json['data']) : null;
-  }
-
-}
-
-class Data {
-  List<productInfo> list;
-  int totalNum;
-  String pageId;
-
-  Data({this.list, this.totalNum, this.pageId});
-
-  Data.fromJson(Map<String, dynamic> json) {
-    if (json['list'] != null) {
-      list = new List();
-      json['list'].forEach((v) {
-        list.add(new productInfo.fromJson(v));
+    if (json['data'] != null) {
+      data = new List<guessLikeInfoModel>();
+      json['data'].forEach((v) {
+        data.add(new guessLikeInfoModel.fromJson(v));
       });
     }
-    totalNum = json['totalNum'];
-    pageId = json['pageId'];
   }
 
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['time'] = this.time;
+    data['code'] = this.code;
+    data['msg'] = this.msg;
+    if (this.data != null) {
+      data['data'] = this.data.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
 }
 
-class productInfo {
+class guessLikeInfoModel {
   int id;
   String goodsId;
   String title;
@@ -86,12 +81,8 @@ class productInfo {
   double servicePercent;
   List<int> subcid;
   int tbcid;
-  int quanMLink;
-  int hzQuanOver;
-  int yunfeixian;
-  int estimateAmount;
 
-  productInfo(
+  guessLikeInfoModel(
       {this.id,
       this.goodsId,
       this.title,
@@ -141,13 +132,9 @@ class productInfo {
       this.serviceScore,
       this.servicePercent,
       this.subcid,
-      this.tbcid,
-      this.quanMLink,
-      this.hzQuanOver,
-      this.yunfeixian,
-      this.estimateAmount});
+      this.tbcid});
 
-  productInfo.fromJson(Map<String, dynamic> json) {
+  guessLikeInfoModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     goodsId = json['goodsId'];
     title = json['title'];
@@ -198,9 +185,60 @@ class productInfo {
     servicePercent = json['servicePercent'];
     subcid = json['subcid'].cast<int>();
     tbcid = json['tbcid'];
-    quanMLink = json['quanMLink'];
-    hzQuanOver = json['hzQuanOver'];
-    yunfeixian = json['yunfeixian'];
-    estimateAmount = json['estimateAmount'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['goodsId'] = this.goodsId;
+    data['title'] = this.title;
+    data['dtitle'] = this.dtitle;
+    data['originalPrice'] = this.originalPrice;
+    data['actualPrice'] = this.actualPrice;
+    data['shopType'] = this.shopType;
+    data['goldSellers'] = this.goldSellers;
+    data['monthSales'] = this.monthSales;
+    data['twoHoursSales'] = this.twoHoursSales;
+    data['dailySales'] = this.dailySales;
+    data['commissionType'] = this.commissionType;
+    data['desc'] = this.desc;
+    data['couponReceiveNum'] = this.couponReceiveNum;
+    data['couponLink'] = this.couponLink;
+    data['couponEndTime'] = this.couponEndTime;
+    data['couponStartTime'] = this.couponStartTime;
+    data['couponPrice'] = this.couponPrice;
+    data['couponConditions'] = this.couponConditions;
+    data['activityType'] = this.activityType;
+    data['createTime'] = this.createTime;
+    data['mainPic'] = this.mainPic;
+    data['marketingMainPic'] = this.marketingMainPic;
+    data['sellerId'] = this.sellerId;
+    data['cid'] = this.cid;
+    data['discounts'] = this.discounts;
+    data['commissionRate'] = this.commissionRate;
+    data['couponTotalNum'] = this.couponTotalNum;
+    data['haitao'] = this.haitao;
+    data['activityStartTime'] = this.activityStartTime;
+    data['activityEndTime'] = this.activityEndTime;
+    data['shopName'] = this.shopName;
+    data['shopLevel'] = this.shopLevel;
+    data['descScore'] = this.descScore;
+    data['brand'] = this.brand;
+    data['brandId'] = this.brandId;
+    data['brandName'] = this.brandName;
+    data['hotPush'] = this.hotPush;
+    data['teamName'] = this.teamName;
+    data['itemLink'] = this.itemLink;
+    data['tchaoshi'] = this.tchaoshi;
+    data['detailPics'] = this.detailPics;
+    data['dsrScore'] = this.dsrScore;
+    data['dsrPercent'] = this.dsrPercent;
+    data['shipScore'] = this.shipScore;
+    data['shipPercent'] = this.shipPercent;
+    data['serviceScore'] = this.serviceScore;
+    data['servicePercent'] = this.servicePercent;
+    data['subcid'] = this.subcid;
+    data['tbcid'] = this.tbcid;
+    return data;
   }
 }

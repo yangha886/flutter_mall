@@ -1,22 +1,30 @@
 import 'dart:convert';
 import 'dart:core';
 import 'dart:io';
+import 'package:fluro/fluro.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
+import 'package:provide/provide.dart';
+import 'package:tkjidi/Account/main_Account.dart';
 import 'package:tkjidi/Config/httpConfig.dart' as prefix0;
 import 'package:tkjidi/Config/viewConfig.dart';
+import 'package:tkjidi/Home/Models/ninedotnineModel.dart' as prefix1;
+import 'package:tkjidi/Home/searchAppBar.dart';
 import 'package:tkjidi/Request/httpRequest.dart';
 import 'package:flutter/material.dart';
 import 'package:tkjidi/Home/Models/ninedotnineModel.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:tkjidi/provider/productDetailProvider.dart';
+import 'package:tkjidi/routes/application.dart';
 class Main_Home extends StatefulWidget {
   @override
   _Main_HomeState createState() => _Main_HomeState();
 }
-
+BuildContext homeContext;
 class _Main_HomeState extends State<Main_Home> {
   
-  List<ninedotnineModel> dataList = [];
+  ninedotnineModel dataList;
   List catalogueList = [];
   Future <List> getCatalogueListData() async{
     Map query = {"appKey":prefix0.appkey,"version":"v1.1.0"};
@@ -25,17 +33,10 @@ class _Main_HomeState extends State<Main_Home> {
     return rawList;
   }
   //调用9.9包邮接口
-  Future <List<ninedotnineModel>> getHomeData() async{
+  Future <ninedotnineModel> getHomeData() async{
     Map query = {"appKey":prefix0.appkey,"version":"v1.1.0","pageSize":"20","pageId":"1","nineCid":"-1"};
     var val = await httpRequest().request(prefix0.ndnpath, query);
-    List rawList = val['data']['list'] as List;
-    bool show = false;
-    var models = rawList.map((map){
-      var model = map as Map;
-      ninedotnineModel ndnModel = ninedotnineModel(model["id"], model["goodsId"], model["title"], model["dtitle"], model["originalPrice"], model["actualPrice"], model["shopType"], model["goldSellers"], model["monthSales"], model["twoHoursSales"], model["dailySales"], model["desc"], model["couponReceiveNum"], model["couponTotalNum"], model["couponPrice"], model["couponLine"], model["couponEndTime"], model["couponStartTime"], model["mainPic"], model["marketingMainPic"], model["shopName"], model["itemLink"]);
-      return ndnModel;
-    }).toList();
-    return models;
+    return ninedotnineModel.fromJson(val);
     
   }
   void getNDNProductRequest() async{
@@ -48,48 +49,65 @@ class _Main_HomeState extends State<Main_Home> {
   }
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    
     getNDNProductRequest();
+  }
+  FocusNode _focusNode;
+  TextEditingController _controller = TextEditingController();
+  void _checkInput(){
+
   }
   @override
   Widget build(BuildContext context) {
+    homeContext = context;
     ScreenUtil.instance = ScreenUtil(width: 750,height: 1334)..init(context);
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: Text("9.9包邮"),
-        ),
-        body: SingleChildScrollView(
-      child: Column(
-        children: <Widget>[
-          topBanner(),
-          greyLineUI(),
-          gridView(),
-          greyLineUI(),
-          cataloguesView(catalogueList),
-          ndnTitle(),
-          ndnProductList(dataList),
-        ],
-      ),
-      
-    ),
+        body: Stack(
+          children: <Widget>[
+            Container(
+              color: Colors.white,
+            ),
+            Positioned(
+              top: 24,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: <Widget>[
+                    topBanner(),
+                    greyLineUI(),
+                    gridView(),
+                    greyLineUI(),
+                    if (catalogueList.length > 0)
+                      cataloguesView(catalogueList),
+                    ndnTitle(),
+                    if (dataList != null)
+                      ndnProductList(dataList.data.list),
+                  ],
+                ),
+              ),
+            ),
+            Container(
+              height: ssSetHeigth(164),
+              color: Colors.transparent,
+              child: SearchAppBar(
+                focusNode: _focusNode,
+                controller: _controller,
+                height: 50,
+                evevation: 0,
+                inputFormatters: [LengthLimitingTextInputFormatter(50)],
+                onEditingComplete: ()=>_checkInput(),
+              ),
+            )
+          ],
+        )
       ),
     );
   }
 }
-//灰线
-class greyLineUI extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.grey[200],
-      height: ssSetHeigth(10),
-      constraints: BoxConstraints.expand(height: 10),
-    );
-  }
-}
+
 //广告牌
 class adBanner extends StatelessWidget {
   final String bannerUrl;
@@ -172,9 +190,10 @@ class gridView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      
       height: ssSetHeigth(350),
       width: ssSetWidth(750),
-      padding: EdgeInsets.all(3),
+      padding: EdgeInsets.all(10),
       child: GridView.count(
         physics: NeverScrollableScrollPhysics(),
         shrinkWrap: true,
@@ -193,46 +212,22 @@ class cataloguesView extends StatelessWidget {
   cataloguesView(this.cataoguesList);
   @override
   Widget build(BuildContext context) {
-    if (cataoguesList.length == 0){
-      return Center(
-        child: CircularProgressIndicator(),
-      );
-    }
     return Column(
       children: cataoguesList.map((item){
         return catalogInfoNoStateTest(item);
       }).toList(),
     );
-    //因为没有使用appbar所以导致listview第一行顶部会有一片空白padding,所以使用removePadding
-    // return MediaQuery.removePadding(
-    //   removeTop: true,
-    //   context: context,
-    //   child: ListView.builder(
-    //     physics: NeverScrollableScrollPhysics(),
-    //     shrinkWrap: true,
-    //     itemCount: cataoguesList.length,
-    //     itemBuilder: (context,index){
-    //       return catalogInfoNoStateTest(cataoguesList[index]);
-    //     },
-    //   ),
-    // );
   }
 }
 //单个热门活动模块
 class catalogInfoNoStateTest extends StatelessWidget {
   final Map item;
-  List<ninedotnineModel> productList;
   catalogInfoNoStateTest(this.item);
-  Future <List<ninedotnineModel>> _getActivityProdctList() async{
+  Future <ninedotnineModel> _getActivityProdctList() async{
     Map query = {"appKey":prefix0.appkey,"version":"v1.1.0","pageSize":"20","pageId":"1","activityId":"${item["activityId"]}"};
     var rawData = await httpRequest().request(prefix0.cataProductpath, query);
-    List rawList = rawData["data"]["list"] as List;
-    var models = rawList.map((map){
-      var model = map as Map;
-      ninedotnineModel ndnModel = ninedotnineModel(model["id"], model["goodsId"], model["title"], model["dtitle"], model["originalPrice"], model["actualPrice"], model["shopType"], model["goldSellers"], model["monthSales"], model["twoHoursSales"], model["dailySales"], model["desc"], model["couponReceiveNum"], model["couponTotalNum"], model["couponPrice"], model["couponLine"], model["couponEndTime"], model["couponStartTime"], model["mainPic"], model["marketingMainPic"], model["shopName"], model["itemLink"]);
-      return ndnModel;
-    }).toList();
-    return models;
+    ninedotnineModel model = ninedotnineModel.fromJson(rawData);
+    return model;
   }
  
   @override
@@ -241,7 +236,7 @@ class catalogInfoNoStateTest extends StatelessWidget {
       future: _getActivityProdctList(),
       builder: (context, snapshot){
         if (snapshot.hasData){
-          productList = snapshot.data as List;
+          ninedotnineModel ndnmodel = snapshot.data as ninedotnineModel;
           String imgUrl = fixImgUrl(item['goodsLabel']);
           String imgdUrl = fixImgUrl(item['detailLabel']);
           print('单个活动热门');
@@ -272,10 +267,10 @@ class catalogInfoNoStateTest extends StatelessWidget {
                   height: ssSetHeigth(330),
                   width: ssSetWidth(750),
                   child: ListView.builder(
-                    itemCount: productList.length,
+                    itemCount: ndnmodel.data.list.length,
                     scrollDirection: Axis.horizontal,
                     itemBuilder: (context,index){
-                      return singleActivityProductView(productList[index]);
+                      return singleActivityProductView(ndnmodel.data.list[index]);
                     },
                   )
                 ),
@@ -315,7 +310,7 @@ class catalogTitleView extends StatelessWidget {
 }
 //单个活动商品展示
 class singleActivityProductView extends StatelessWidget {
-  final ninedotnineModel model;
+  final productInfo model;
   singleActivityProductView(this.model);
   @override
   Widget build(BuildContext context) {
@@ -324,7 +319,10 @@ class singleActivityProductView extends StatelessWidget {
     print('单个活动商品');
     return InkWell(
       
-      onTap: (){},
+      onTap: (){
+        Provide.value<ProductDetailProvider>(context).setProductModel(model.id.toString());
+        Application.router.navigateTo(context, '/productDetailView?id=${model.id}');
+      },
       child: Container(
         height: ssSetHeigth(330),
         width: ssSetWidth(250),
@@ -358,9 +356,9 @@ class ndnTitle extends StatelessWidget {
 }
 //9.9商品列表
 class ndnProductList extends StatelessWidget {
-  List<ninedotnineModel> _dataList;
+  List<productInfo> _dataList;
   ndnProductList(this._dataList);
-  Widget _ndnProductCell(ninedotnineModel model){
+  Widget _ndnProductCell(context,productInfo model){
     String imgString = fixImgUrl(model.mainPic);
     String monthSales = fixImgUrl(model.monthSales.toString());
     if (monthSales.length > 3){
@@ -370,56 +368,62 @@ class ndnProductList extends StatelessWidget {
       color: Colors.white,
       height:  ssSetHeigth(340),
       width:  ssSetWidth(750),
-      child: Row(
-        children: <Widget>[
-          ClipRRect(
-            borderRadius: BorderRadius.circular(5),
-            child: Container(
-              width: ssSetWidth(300),
-              height: ssSetHeigth(300),
-              padding: EdgeInsets.all(10),
-              margin: EdgeInsets.only(bottom: 0),
-              child: Image.network(imgString,fit: BoxFit.fill),
+      child: InkWell(
+        onTap: (){
+          Provide.value<ProductDetailProvider>(context).setProductModel(model.id.toString());
+          Application.router.navigateTo(homeContext, '/productDetailView?id=${model.id}',transition: TransitionType.inFromRight);
+        },
+        child: Row(
+          children: <Widget>[
+            ClipRRect(
+              borderRadius: BorderRadius.circular(5),
+              child: Container(
+                width: ssSetWidth(300),
+                height: ssSetHeigth(300),
+                padding: EdgeInsets.all(10),
+                margin: EdgeInsets.only(bottom: 0),
+                child: Image.network(imgString,fit: BoxFit.fill),
+              ),
             ),
-          ),
-          Container(
-            child: Column(
-              children: <Widget>[
-                Container(
-                  width: ssSetWidth(430),
-                  height: ssSetHeigth(160),
-                  margin: EdgeInsets.only(top: 20),
-                  child: Text(model.dtitle,maxLines: 2,style: TextStyle(fontSize: 16),),
-                ),
-                Container(
-                  margin: EdgeInsets.all(4),
-                  width: ssSetWidth(430),
-                  height: ssSetHeigth(38),
-                  child: Text('优惠价:¥${model.actualPrice}',style: TextStyle(color: Colors.pink,fontSize: 14),textAlign: TextAlign.left,),
-                ),
-                Container(
-                  width: ssSetWidth(430),
-                  height: ssSetHeigth(40),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Text('${model.shopType==0?"淘宝":"天猫"}价:¥${model.originalPrice}',style: TextStyle(decoration: TextDecoration.lineThrough,fontSize: 12,color: Colors.grey[600]),),
-                      ),
-                      Text('已售$monthSales'),
-                    ],
+            Container(
+              child: Column(
+                children: <Widget>[
+                  Container(
+                    width: ssSetWidth(430),
+                    height: ssSetHeigth(160),
+                    margin: EdgeInsets.only(top: 20),
+                    child: Text(model.dtitle,maxLines: 2,style: TextStyle(fontSize: 16),),
                   ),
-                ),
-                Container(
-                  height: ssSetHeigth(1),
-                  width: ssSetWidth(430),
-                  margin: EdgeInsets.only(top: 10),
-                  color: Colors.grey[200],
-                )
-              ],
-            ),
-          )
-        ],
-      ),
+                  Container(
+                    margin: EdgeInsets.all(4),
+                    width: ssSetWidth(430),
+                    height: ssSetHeigth(38),
+                    child: Text('优惠价:¥${model.actualPrice}',style: TextStyle(color: Colors.pink,fontSize: 14),textAlign: TextAlign.left,),
+                  ),
+                  Container(
+                    width: ssSetWidth(430),
+                    height: ssSetHeigth(40),
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Text('${model.shopType==0?"淘宝":"天猫"}价:¥${model.originalPrice}',style: TextStyle(decoration: TextDecoration.lineThrough,fontSize: 12,color: Colors.grey[600]),),
+                        ),
+                        Text('已售$monthSales'),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    height: ssSetHeigth(1),
+                    width: ssSetWidth(430),
+                    margin: EdgeInsets.only(top: 10),
+                    color: Colors.grey[200],
+                  )
+                ],
+              ),
+            )
+          ],
+        ),
+      )
     );
   }
   @override
@@ -429,7 +433,7 @@ class ndnProductList extends StatelessWidget {
       shrinkWrap: true,
       itemCount: _dataList.length,
       itemBuilder: (context,index){
-        return _ndnProductCell(_dataList[index]);
+        return _ndnProductCell(context,_dataList[index]);
       },
     );
   }

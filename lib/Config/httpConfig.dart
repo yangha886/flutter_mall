@@ -11,3 +11,7 @@ final cataProductpath = "/api/goods/activity/goods-list";
 final ndnpath = "/api/goods/nine/op-goods-list";
 //超级分类
 final supcatelogListPath = '/api/category/get-super-category';
+//商品详情
+final productDetailPath = '/api/goods/get-goods-details';
+//猜你喜欢
+final guessYouLikePath = '/api/goods/list-similer-goods-by-open';

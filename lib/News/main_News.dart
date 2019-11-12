@@ -4,15 +4,16 @@ import 'package:tkjidi/provider/supCategoly.dart';
 import 'package:tkjidi/Config/httpConfig.dart';
 import 'package:tkjidi/Config/viewConfig.dart';
 import 'package:tkjidi/Request/httpRequest.dart';
+import 'package:tkjidi/routes/application.dart';
 class CategolyList extends StatelessWidget {
   List data = [];
+  
   Future<List> _getCategolyList() async{
     Map query = {"appKey":appkey,"version":"v1.1.0"};
     var rawData = await httpRequest().request(supcatelogListPath, query);
     if (rawData != null)
       return rawData['data'] as List;
   }
-  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,7 +31,7 @@ class CategolyList extends StatelessWidget {
                   leftCatagolyList(data),
                   Provide<SupCategoly>(
                     builder: (context,child,supCate){
-                      return rightCatagolyList(data[supCate.selectCIndex]['subcategories']);
+                      return rightCatagolyList(data[supCate.selectCIndex]['subcategories'],context);
                     },
                   )
                 ],
@@ -48,13 +49,15 @@ class CategolyList extends StatelessWidget {
 }
 class rightCatagolyList extends StatelessWidget {
   List data;
-  rightCatagolyList(this.data);
+  BuildContext context;
+  rightCatagolyList(this.data,this.context);
   Widget _rightInkWell(Map item){
     String imgurl = fixImgUrl(item['scpic']);
     return Container(
       height: ssSetHeigth(130),
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
+        color: Colors.white,
         border: BorderDirectional(
           bottom: BorderSide(width: 0.5,color: Colors.grey[200]),
         )
@@ -62,6 +65,7 @@ class rightCatagolyList extends StatelessWidget {
       child: InkWell(
         onTap: (){
           print(item['subcname']);
+          Application.router.navigateTo(context, '/productDetailList?id=${item['subcid']}');
         },
         child: Row(
           children: <Widget>[
