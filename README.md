@@ -19,15 +19,15 @@
 
 ## 2019-11-12
 
-本来打算做个人中心的,发现缺少的数据实在太多就简单部了一个stack层叠视图就隔那了.用了几次Provide后发现,还真是好用啊哈哈
+本来打算做个人中心的,发现缺少的数据实在太多就简单部了一个stack层叠视图就搁那了.用了几次Provide后发现,还真是好用啊哈哈
 
 今天主要更新内容:
 
-1.首页顶部appbar增加自定义搜索框
+1.首页顶部appbar增加'自定义搜索框'
 
-2.使用Fluro增加路由
+2.使用Fluro增加'路由'
 
-3.增加商品详情页(/home/productDetail文件夹)
+3.增加'商品详情页'(/home/productDetail文件夹)
 
 4.修复一些因数据缺失导致的BUG
 
@@ -61,21 +61,21 @@ http://www.fluttericon.com/                 flutter的ICON库,可以比较方便
 
 库:
 
-url_launcher          支持HTTP/HTTPS/TEL/MAILTO/SMS
+'url_launcher'          支持HTTP/HTTPS/TEL/MAILTO/SMS
 
-fluro                 路由
+'fluro'                 路由
 
-provide               状态管理
+'provide'               状态管理
 
-flutter_screenutil    屏幕适配
+'flutter_screenutil'    屏幕适配
 
-flutter_swiper        轮播图
+'flutter_swiper'        轮播图
 
-flutter_easyrefresh   上拉下拉刷新
+'flutter_easyrefresh'   上拉下拉刷新
 
-cached_network_image  缓存图片
+'cached_network_image'  缓存图片
 
-fluttertoast          提示框
+'fluttertoast'          提示框
 
 ## 碰到的问题记录一下:
 
