@@ -79,6 +79,11 @@ http://www.fluttericon.com/                 flutter的ICON库,可以比较方便
 
 ## 效果图
 ![](https://github.com/yangha886/flutter_mall/raw/master/preview/Screenshot_1573955909.png)
+![](https://github.com/yangha886/flutter_mall/raw/master/preview/Screenshot_1573955921.png)
+![](https://github.com/yangha886/flutter_mall/raw/master/preview/Screenshot_1573955927.png)
+![](https://github.com/yangha886/flutter_mall/raw/master/preview/Screenshot_1573955931.png)
+![](https://github.com/yangha886/flutter_mall/raw/master/preview/Screenshot_1573955940.png)
+![](https://github.com/yangha886/flutter_mall/raw/master/preview/Screenshot_1573955948.png)
 
 ## 碰到的问题记录一下:
 
