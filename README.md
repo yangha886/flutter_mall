@@ -77,6 +77,9 @@ http://www.fluttericon.com/                 flutter的ICON库,可以比较方便
 
 'fluttertoast'          提示框
 
+## 效果图
+![](https://github.com/yangha886/flutter_mall/raw/master/preview/Screenshot_1573955909.png)
+
 ## 碰到的问题记录一下:
 
 1.首页模块需要用到级联查询接口,类似查询一个热门活动列表后根据活动id查询对应活动商品.
