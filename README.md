@@ -35,6 +35,22 @@
 
 6.分类模块二级页面完成,增加路由(未实现商品列表页面)
 
+##2019-11-17更新内容:
+
+1.UI推翻重做(首页布局调整,渐变式appbar,详情页监听滚动视图实现appbar的隐藏显示,分类二级分类修改成网格显示)
+
+2.新增商品列表页面
+
+3.详情页面数据以及功能完善
+
+4.首页增加上拉加载下拉刷新
+
+5.修改成沉浸式的状态栏
+
+6.修复搜索框点击时页面缩进错乱的BUG
+
+7.零七八碎的小东西也改了一堆
+
 ## 好用的工具包括插件在这里汇总一下:
 
 网站:
@@ -45,15 +61,21 @@ http://www.fluttericon.com/                 flutter的ICON库,可以比较方便
 
 库:
 
-url_launcher        支持HTTP/HTTPS/TEL/MAILTO/SMS
+url_launcher          支持HTTP/HTTPS/TEL/MAILTO/SMS
 
-fluro               路由
+fluro                 路由
 
-provide             状态管理
+provide               状态管理
 
-flutter_screenutil  屏幕适配
+flutter_screenutil    屏幕适配
 
-flutter_swiper      轮播图
+flutter_swiper        轮播图
+
+flutter_easyrefresh   上拉下拉刷新
+
+cached_network_image  缓存图片
+
+fluttertoast          提示框
 
 ## 碰到的问题记录一下:
 
@@ -73,4 +95,4 @@ flutter_swiper      轮播图
 
 7.expand里就不要设置宽高了,冲突
 
-
+8.路由跳转如果遇到跳转后bottombar没有消失,可以尝试把跳转传参时的context指定成页面根组件的context.
