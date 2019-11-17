@@ -1,10 +1,13 @@
+import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provide/provide.dart';
 import 'package:tkjidi/provider/supCategoly.dart';
 import 'package:tkjidi/Config/httpConfig.dart';
 import 'package:tkjidi/Config/viewConfig.dart';
 import 'package:tkjidi/Request/httpRequest.dart';
 import 'package:tkjidi/routes/application.dart';
+import 'package:tkjidi/Home/searchAppBar.dart';
 class CategolyList extends StatelessWidget {
   List data = [];
   
@@ -14,12 +17,23 @@ class CategolyList extends StatelessWidget {
     if (rawData != null)
       return rawData['data'] as List;
   }
+  FocusNode _focusNode;
+  TextEditingController _controller = TextEditingController();
+  void _checkInput(){
+
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('分类'),
-      ),
+      appBar: SearchAppBar(
+          focusNode: _focusNode,
+          controller: _controller,
+          height: 50,
+          evevation: 0,
+          inputFormatters: [LengthLimitingTextInputFormatter(70)],
+          onEditingComplete: ()=>_checkInput(),
+          backGroundColor: [Colors.amber[300],Colors.red[300],Colors.pink[300]],
+        ),
       body: Container(
         child: FutureBuilder(
           future: _getCategolyList(),
@@ -52,34 +66,29 @@ class rightCatagolyList extends StatelessWidget {
   BuildContext context;
   rightCatagolyList(this.data,this.context);
   Widget _rightInkWell(Map item){
-    String imgurl = fixImgUrl(item['scpic']);
+    String imgurl = item['scpic'];
     return Container(
-      height: ssSetHeigth(130),
-      padding: EdgeInsets.all(10),
+      //height: ssSetHeigth(130),
+      padding: EdgeInsets.all(3),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: BorderDirectional(
-          bottom: BorderSide(width: 0.5,color: Colors.grey[200]),
-        )
       ),
       child: InkWell(
         onTap: (){
-          print(item['subcname']);
-          Application.router.navigateTo(context, '/productDetailList?id=${item['subcid']}');
+          Application.router.navigateTo(context, '/productDetailList?id=${item['subcid']}&title=${Uri.encodeComponent(item['subcname'])}&type=catagory',transition:TransitionType.inFromRight);
         },
-        child: Row(
+        child: Column(
           children: <Widget>[
-            ClipRRect(
-              borderRadius: BorderRadius.circular(5),
-              child: Image.network(item['scpic'],fit: BoxFit.fill,),
+            Container(
+              padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
+              child: returnImageWithUrl(imgurl),
             ),
             Expanded(
               child: Container(
-                margin: EdgeInsets.only(left: 20),
-                child: Text(item['subcname']),
+                margin: EdgeInsets.only(left: 0),
+                child: Text(item['subcname'],textAlign: TextAlign.center,),
               ),
             ),
-            Icon(Icons.keyboard_arrow_right,color: Colors.black54,),
             
           ],
         ),
@@ -90,12 +99,16 @@ class rightCatagolyList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: ssSetWidth(550),
-      child: ListView.builder(
-        itemCount: data.length,
+      child: GridView.builder(
         itemBuilder: (context,index){
           return _rightInkWell(data[index]);
         },
-      ),
+        itemCount: data.length,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          childAspectRatio: 0.85,
+        ),
+      )
     );
   }
 }
@@ -110,13 +123,28 @@ class leftCatagolyList extends StatelessWidget {
       },
       child:  Container(
         height: ssSetHeigth(80),
-        padding: EdgeInsets.only(left: 8,top: 8),
-        child: Text(data[itemIndex]['cname']),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              width: ssSetWidth(8),
+              height: ssSetHeigth(70),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(2),
+                child: Container(
+                  color: itemIndex!=selectedIndex?Colors.grey[200]: Colors.red,
+                ),
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.only(left: 12),
+              child: Text(data[itemIndex]['cname'],textAlign: TextAlign.center,style: TextStyle(color: itemIndex!=selectedIndex? Colors.black87:Colors.red)),
+            )
+            
+          ],
+        ),
         decoration: BoxDecoration(
-          color: itemIndex==selectedIndex? Colors.grey[300]:Colors.white,
-          border: Border(
-            bottom: BorderSide(width: 0.5,color: Colors.grey[300]),
-          )
+          color: itemIndex!=selectedIndex? Colors.grey[200]:Colors.white,
         ),
       )
     );

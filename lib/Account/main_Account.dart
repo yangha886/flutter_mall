@@ -18,7 +18,7 @@ class Main_Account extends StatelessWidget {
               ),
               Positioned(
                 left: 15,
-                top: 15,
+                top: 27,
                 child:  Row(
                   children: <Widget>[
                     ClipRRect(
@@ -44,7 +44,7 @@ class Main_Account extends StatelessWidget {
               ),
               Positioned(
                 right: 15,
-                top: 15,
+                top: 35,
                 child: IconButton(
                   icon: Icon(Icons.settings,color: Colors.white,),
                   onPressed: (){
@@ -73,6 +73,7 @@ class Main_Account extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
+      top: false,
       child: Column(
         children: <Widget>[
           MediaQuery.removePadding(

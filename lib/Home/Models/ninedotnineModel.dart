@@ -1,32 +1,34 @@
-class ninedotnineModel {
+class ninedotnineListModel {
   int time;
   int code;
   String msg;
-  Data data;
+  NDNData data;
 
-  ninedotnineModel({this.time, this.code, this.msg, this.data});
+  ninedotnineListModel({this.time, this.code, this.msg, this.data});
 
-  ninedotnineModel.fromJson(Map<String, dynamic> json) {
-    time = json['time'];
-    code = json['code'];
-    msg = json['msg'];
-    data = json['data'] != null ? new Data.fromJson(json['data']) : null;
+  ninedotnineListModel.fromJson(Map<String, dynamic> json) {
+    if (json != null) {
+      time = json['time'];
+      code = json['code'];
+      msg = json['msg'];
+      data = json['data'] != null ? new NDNData.fromJson(json['data']) : null;
+    }
   }
 
 }
 
-class Data {
-  List<productInfo> list;
+class NDNData {
+  List<productInfoModel> list;
   int totalNum;
   String pageId;
 
-  Data({this.list, this.totalNum, this.pageId});
+  NDNData({this.list, this.totalNum, this.pageId});
 
-  Data.fromJson(Map<String, dynamic> json) {
+  NDNData.fromJson(Map<String, dynamic> json) {
     if (json['list'] != null) {
       list = new List();
       json['list'].forEach((v) {
-        list.add(new productInfo.fromJson(v));
+        list.add(new productInfoModel.fromJson(v));
       });
     }
     totalNum = json['totalNum'];
@@ -35,7 +37,7 @@ class Data {
 
 }
 
-class productInfo {
+class productInfoModel {
   int id;
   String goodsId;
   String title;
@@ -89,9 +91,9 @@ class productInfo {
   int quanMLink;
   int hzQuanOver;
   int yunfeixian;
-  int estimateAmount;
+  double estimateAmount;
 
-  productInfo(
+  productInfoModel(
       {this.id,
       this.goodsId,
       this.title,
@@ -147,7 +149,7 @@ class productInfo {
       this.yunfeixian,
       this.estimateAmount});
 
-  productInfo.fromJson(Map<String, dynamic> json) {
+  productInfoModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     goodsId = json['goodsId'];
     title = json['title'];
@@ -193,7 +195,7 @@ class productInfo {
     dsrScore = json['dsrScore'];
     dsrPercent = json['dsrPercent'];
     shipScore = json['shipScore'];
-    shipPercent = json['shipPercent'];
+    shipPercent = json['shipPercent'] < 0? 0:json['shipPercent'];
     serviceScore = json['serviceScore'];
     servicePercent = json['servicePercent'];
     subcid = json['subcid'].cast<int>();
@@ -201,6 +203,6 @@ class productInfo {
     quanMLink = json['quanMLink'];
     hzQuanOver = json['hzQuanOver'];
     yunfeixian = json['yunfeixian'];
-    estimateAmount = json['estimateAmount'];
+    estimateAmount = json['estimateAmount'] < 0? 0:json['estimateAmount'];
   }
 }

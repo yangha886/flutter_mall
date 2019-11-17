@@ -9,10 +9,14 @@ class productDetailInfoDataModel {
   productDetailInfoDataModel({this.time, this.code, this.msg, this.data});
 
   productDetailInfoDataModel.fromJson(Map<String, dynamic> json) {
-    time = json['time'];
-    code = json['code'];
-    msg = json['msg'];
-    data = json['data'] != null ? new ProductDetailInfoModel.fromJson(json['data']) : null;
+    
+
+    if (json != null) {
+      time = json['time'];
+      code = json['code'];
+      msg = json['msg'];
+      data = json['data'] != null ? new ProductDetailInfoModel.fromJson(json['data']) : null;
+    }
   }
 
   Map<String, dynamic> toJson() {

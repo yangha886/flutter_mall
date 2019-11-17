@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:tkjidi/Home/main_Home.dart';
 import 'package:tkjidi/Account/main_Account.dart';
 import 'package:tkjidi/News/main_News.dart';
@@ -16,6 +19,17 @@ void main(){
   ..provide(Provider<SupCategoly>.value(supcate))
   ..provide(Provider<ProductDetailProvider>.value(productDetail));
   runApp(ProviderNode(child: MyApp(), providers: provi,));
+
+  if(Platform.isAndroid){
+    SystemUiOverlayStyle style = SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      ///这是设置状态栏的图标和字体的颜色 
+      ///Brightness.light  一般都是显示为白色
+      ///Brightness.dark 一般都是显示为黑色
+      statusBarIconBrightness: Brightness.light
+    );
+    SystemChrome.setSystemUIOverlayStyle(style);
+  }
 }
 
 class MyApp extends StatefulWidget {

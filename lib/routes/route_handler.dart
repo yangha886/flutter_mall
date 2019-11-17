@@ -6,8 +6,10 @@ import 'package:tkjidi/News/products_list.dart';
 import 'package:tkjidi/Home/productDetailView.dart';
 Handler productListHandler = Handler(
   handlerFunc: (BuildContext context, Map<String,List<String>> parameters){
-    String balbal = parameters['id'].first;
-    return Products_List(balbal);
+    String cid = parameters['id'].first;
+    String title = parameters['title'].first;
+    String type = parameters['type'].first;
+    return Products_list(cid,title,type);
   }
 );
 

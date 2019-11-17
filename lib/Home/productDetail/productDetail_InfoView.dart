@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tkjidi/Request/httpRequest.dart';
 import '../Models/productDetailInfoModel.dart';
 import 'package:tkjidi/Config/viewConfig.dart';
 
@@ -17,9 +18,10 @@ class ProductDetail_InfoView extends StatelessWidget {
             shrinkWrap: true,
             itemCount: model.detailPics.length,
             itemBuilder: (context,index){
-              return Image.network(model.detailPics[index],fit: BoxFit.cover,);
+              return returnImageWithUrl(model.detailPics[index]);
             },
-          )
+          ),
+          greyLineUI()
         ],
       )
     );

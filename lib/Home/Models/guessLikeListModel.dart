@@ -1,3 +1,5 @@
+
+
 class guessLikeListModel {
   int time;
   int code;
@@ -7,7 +9,8 @@ class guessLikeListModel {
   guessLikeListModel({this.time, this.code, this.msg, this.data});
 
   guessLikeListModel.fromJson(Map<String, dynamic> json) {
-    time = json['time'];
+    if (json != null) {
+      time = json['time'];
     code = json['code'];
     msg = json['msg'];
     if (json['data'] != null) {
@@ -16,6 +19,8 @@ class guessLikeListModel {
         data.add(new guessLikeInfoModel.fromJson(v));
       });
     }
+    }
+    
   }
 
   Map<String, dynamic> toJson() {
@@ -81,7 +86,9 @@ class guessLikeInfoModel {
   double servicePercent;
   List<int> subcid;
   int tbcid;
-
+  double setDoubleData(var data){
+    return data<0? 0:data;
+  }
   guessLikeInfoModel(
       {this.id,
       this.goodsId,
@@ -177,12 +184,12 @@ class guessLikeInfoModel {
     itemLink = json['itemLink'];
     tchaoshi = json['tchaoshi'];
     detailPics = json['detailPics'];
-    dsrScore = json['dsrScore'];
-    dsrPercent = json['dsrPercent'];
-    shipScore = json['shipScore'];
-    shipPercent = json['shipPercent'];
-    serviceScore = json['serviceScore'];
-    servicePercent = json['servicePercent'];
+    dsrScore = setDoubleData(json['dsrScore']);
+    dsrPercent = setDoubleData(json['dsrPercent']);
+    shipScore = setDoubleData(json['shipScore']);
+    shipPercent = setDoubleData(json['shipPercent']);
+    serviceScore = setDoubleData(json['serviceScore']);
+    servicePercent = setDoubleData(json['servicePercent']);
     subcid = json['subcid'].cast<int>();
     tbcid = json['tbcid'];
   }

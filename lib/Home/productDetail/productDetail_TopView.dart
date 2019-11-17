@@ -33,8 +33,8 @@ class ProductDetail_TopView extends StatelessWidget {
       child: Swiper(
             itemCount: model.imgs.length,
             itemBuilder: (context,index){
-              String imgUrl = fixImgUrl(model.imgs[index].toString());
-              return Image.network(imgUrl,fit: BoxFit.cover,);
+              String imgUrl = model.imgs[index].toString();
+              return returnImageWithUrl(imgUrl);
             },
             pagination: SwiperPagination(),
             autoplay: true,
@@ -55,7 +55,7 @@ class ProductDetail_TopView extends StatelessWidget {
   }
   //商品价格
   Widget _productPriceView(){
-    String monthSales = fixImgUrl(model.monthSales.toString());
+    String monthSales = model.monthSales.toString();
     if (monthSales.length > 3){
       monthSales = "${(model.monthSales/10000).toStringAsFixed(2)}万";
     }
@@ -119,7 +119,7 @@ class ProductDetail_TopView extends StatelessWidget {
             height: ssSetHeigth(90),
             child: Row(
               children: <Widget>[
-                Image.network('https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=3049244695,1357729986&fm=15&gp=0.jpg'),
+                returnImageWithUrl('https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=3049244695,1357729986&fm=15&gp=0.jpg'),
                 Container(
                   padding: EdgeInsets.only(left: 10),
                   child: Text(model.shopName),

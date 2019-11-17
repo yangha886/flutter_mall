@@ -4,43 +4,52 @@ import 'dart:io';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_easyrefresh/material_footer.dart';
+import 'package:flutter_easyrefresh/material_header.dart';
 import 'package:provide/provide.dart';
 import 'package:tkjidi/Account/main_Account.dart';
 import 'package:tkjidi/Config/httpConfig.dart' as prefix0;
 import 'package:tkjidi/Config/viewConfig.dart';
-import 'package:tkjidi/Home/Models/ninedotnineModel.dart' as prefix1;
+import 'package:tkjidi/Home/Models/ninedotnineModel.dart';
 import 'package:tkjidi/Home/searchAppBar.dart';
 import 'package:tkjidi/Request/httpRequest.dart';
 import 'package:flutter/material.dart';
-import 'package:tkjidi/Home/Models/ninedotnineModel.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:tkjidi/provider/productDetailProvider.dart';
 import 'package:tkjidi/routes/application.dart';
+import 'package:flutter_easyrefresh/easy_refresh.dart';
 class Main_Home extends StatefulWidget {
   @override
   _Main_HomeState createState() => _Main_HomeState();
 }
 BuildContext homeContext;
+//调用9.9包邮接口,商品列表页面可以共用所以单独拿出来
+Future <ninedotnineListModel> getndnListData(String cid,int pageIndex) async{
+  Map query = {"appKey":prefix0.appkey,"version":"v1.1.0","pageSize":"20","pageId":pageIndex,"nineCid":cid};
+  var val = await httpRequest().request(prefix0.ndnpath, query);
+  return ninedotnineListModel.fromJson(val);
+}
+GlobalKey<_Main_HomeState> _easyRefreshKey = new GlobalKey<_Main_HomeState>();
 class _Main_HomeState extends State<Main_Home> {
-  
-  ninedotnineModel dataList;
+  ninedotnineListModel dataList;
   List catalogueList = [];
+  int nowPageIndex = 1;
+  FocusNode _focusNode;
+  TextEditingController _controller = TextEditingController();
+  List<Map> gridList = <Map>[{"title":"精品","nineCid":"1"},{"title":"居家百货","nineCid":"1"},{"title":"美食","nineCid":"2"},{"title":"服饰","nineCid":"3"},{"title":"配饰","nineCid":"4"},{"title":"美妆","nineCid":"5"},{"title":"内衣","nineCid":"6"},{"title":"母婴","nineCid":"7"},{"title":"箱包","nineCid":"8"},{"title":"数码配件","nineCid":"9"},{"title":"文娱车品","nineCid":"10"}];
+  
   Future <List> getCatalogueListData() async{
     Map query = {"appKey":prefix0.appkey,"version":"v1.1.0"};
     var val = await httpRequest().request(prefix0.cataloguepath, query);
     List rawList = val['data'] as List;
+    
     return rawList;
   }
-  //调用9.9包邮接口
-  Future <ninedotnineModel> getHomeData() async{
-    Map query = {"appKey":prefix0.appkey,"version":"v1.1.0","pageSize":"20","pageId":"1","nineCid":"-1"};
-    var val = await httpRequest().request(prefix0.ndnpath, query);
-    return ninedotnineModel.fromJson(val);
-    
-  }
-  void getNDNProductRequest() async{
-    var models = await getHomeData();
+  
+  void getNDNProductRequest(String cid,int pageIndex) async{
+    var models = await getndnListData(cid,pageIndex);
+    nowPageIndex = pageIndex;
     var cmodels = await getCatalogueListData();
     setState(() {
      dataList = models; 
@@ -50,57 +59,117 @@ class _Main_HomeState extends State<Main_Home> {
   @override
   void initState() {
     super.initState();
-    getNDNProductRequest();
+    getNDNProductRequest('-1',1);
   }
-  FocusNode _focusNode;
-  TextEditingController _controller = TextEditingController();
+  
   void _checkInput(){
 
   }
+  Widget returnNDNCataViewInkWell(int index){
+    return Container(
+      //width: ssSetWidth(80),
+      padding: EdgeInsets.only(left: 10,right: 10),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          InkWell(
+            onTap: (){
+              if (index == 0)return;
+              Application.router.navigateTo(context, '/productDetailList?id=${gridList[index]['nineCid']}&title=${Uri.encodeComponent(gridList[index]['title'])}&type=nineProduct',transition:TransitionType.inFromRight);
+              },
+            child: Center(
+              child: Text(gridList[index]["title"],textAlign: TextAlign.center,style: TextStyle(fontSize: index==0?18:14,color: index==0?Colors.white:Colors.white54),),
+            ),
+          ),
+        ],
+      )
+    );
+  }
+  //导航栏搜索框下的分类组件
+  Widget ndnCatagoryView(){
+    return Container(
+      width: ssSetWidth(750),
+      height: ssSetHeigth(70),
+      padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: gridList.length,
+        itemBuilder: (context,index){
+          return returnNDNCataViewInkWell(index);
+        },
+      ),
+    );
+  }
+  
   @override
   Widget build(BuildContext context) {
     homeContext = context;
     ScreenUtil.instance = ScreenUtil(width: 750,height: 1334)..init(context);
     return MaterialApp(
+      
       home: Scaffold(
+        resizeToAvoidBottomPadding: false,
+        appBar: SearchAppBar(
+          backGroundColor: [Colors.amber[300],Colors.red[300],Colors.pink[300]],
+          focusNode: _focusNode,
+          controller: _controller,
+          height: ssSetHeigth(160),
+          child: ndnCatagoryView(),
+          evevation: 0,
+          inputFormatters: [LengthLimitingTextInputFormatter(70)],
+          onEditingComplete: ()=>_checkInput(),
+        ),
         body: Stack(
           children: <Widget>[
             Container(
-              color: Colors.white,
+              color: Colors.grey[100],
             ),
             Positioned(
-              top: 24,
+              top: 0,
               left: 0,
               right: 0,
               bottom: 0,
-              child: SingleChildScrollView(
-                child: Column(
-                  children: <Widget>[
-                    topBanner(),
-                    greyLineUI(),
-                    gridView(),
-                    greyLineUI(),
-                    if (catalogueList.length > 0)
-                      cataloguesView(catalogueList),
-                    ndnTitle(),
-                    if (dataList != null)
-                      ndnProductList(dataList.data.list),
-                  ],
+              child: EasyRefresh(
+                key: _easyRefreshKey,
+                onLoad: () async{
+                  nowPageIndex ++;
+                  var data = await getndnListData('-1',nowPageIndex);
+                  if (data != null) {
+                    setState(() {
+                      dataList.data.list.addAll(data.data.list);
+                    });
+                  }
+                  
+                },
+                onRefresh: () async{
+                  nowPageIndex =1;
+                  var data = await getndnListData('-1',nowPageIndex);
+                  if (data != null) {
+                    setState(() {
+                      dataList.data.list.clear();
+                      dataList.data.list.addAll(data.data.list);
+                    });
+                  }
+                },
+                header: MaterialHeader(),
+                footer: MaterialFooter(),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: <Widget>[
+                      topBanner(),
+                      greyLineUI(),
+                      if (catalogueList.length > 0)
+                        cataloguesView(catalogueList),
+                      ndnTitle(),
+                      greyLineUI(),
+                      if (dataList != null)
+                        ndnProductList(dataList.data.list,true),
+                    ],
+                  ),
                 ),
-              ),
+              )
             ),
-            Container(
-              height: ssSetHeigth(164),
-              color: Colors.transparent,
-              child: SearchAppBar(
-                focusNode: _focusNode,
-                controller: _controller,
-                height: 50,
-                evevation: 0,
-                inputFormatters: [LengthLimitingTextInputFormatter(50)],
-                onEditingComplete: ()=>_checkInput(),
-              ),
-            )
           ],
         )
       ),
@@ -141,25 +210,55 @@ class topBanner extends StatelessWidget {
           List bannerItem = [];
           for (var item in bannerList) {
             if ((item['banner'] as List).length > 0){
-              bannerItem = item['banner'];
-              break;
+              bannerItem.add((item['banner'] as List).first) ;
             }
           }
           
           if (bannerItem.length ==0){
             bannerItem = ["http://img.zcool.cn/community/01a21d575a17770000018c1bb53779.jpg","http://img.zcool.cn/community/01a21d575a17770000018c1bb53779.jpg","http://img.zcool.cn/community/01a21d575a17770000018c1bb53779.jpg"];
           }
-          return Container(
-            height: ScreenUtil().setHeight(333),
-            width: ScreenUtil().setWidth(750),
-            child: Swiper(
-              itemCount: bannerItem.length,
-              itemBuilder: (context,index){
-                return Image.network(bannerItem[index],fit: BoxFit.fill,);
-              },
-              pagination: SwiperPagination(),
-              autoplay: true,
-            ),
+          return Stack(
+            children: <Widget>[
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                height: ssSetHeigth(300),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.only(bottomLeft: Radius.elliptical(300, 30),bottomRight: Radius.elliptical(300, 30)),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Colors.amber[300],Colors.red[300],Colors.pink[300]],
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight
+                      )
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                child: Container(
+                  color: Colors.transparent,
+                  height: ScreenUtil().setHeight(350),
+                  width: ScreenUtil().setWidth(750),
+                  child: Swiper(
+                    itemCount: bannerItem.length,
+                    itemBuilder: (context,index){
+                      return Container(
+                        padding: EdgeInsets.only(top: 8,bottom: 0,left: 13,right: 13),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.network(bannerItem[index],fit: BoxFit.fill,),
+                        )
+                      );
+                    },
+                    pagination: SwiperPagination(),
+                    autoplay: true,
+                  ),
+                ),
+              )
+            ],
           );
         }else{
            return Center(
@@ -170,42 +269,7 @@ class topBanner extends StatelessWidget {
     );
   }
 }
-//商品分类页
-class gridView extends StatelessWidget {
-  List<Map> gridList = <Map>[{"icon":Icons.home,"title":"居家百货"},{"icon":Icons.add,"title":"美食"},{"icon":Icons.add_a_photo,"title":"服饰"},{"icon":Icons.add_alarm,"title":"配饰"},{"icon":Icons.add_alert,"title":"美妆"},{"icon":Icons.add_box,"title":"内衣"},{"icon":Icons.add_call,"title":"母婴"},{"icon":Icons.add_location,"title":"箱包"},{"icon":Icons.add_location,"title":"数码配件"},{"icon":Icons.add_location,"title":"文娱车品"}];
-  Widget _contextView(BuildContext context,Map item){
-    return InkWell(
-      onTap: ()=>{
-        print("${item.toString()}")
-      },
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Icon(item["icon"]),
-          Text(item["title"]),
-        ],
-      ),
-    );
-  }
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      
-      height: ssSetHeigth(350),
-      width: ssSetWidth(750),
-      padding: EdgeInsets.all(10),
-      child: GridView.count(
-        physics: NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-        padding: EdgeInsets.all(5),
-        crossAxisCount: 5,
-        children: gridList.map((item){
-          return _contextView(context, item);
-        }).toList(),
-      )
-    );
-  }
-}
+
 //热门活动
 class cataloguesView extends StatelessWidget {
   List cataoguesList= [];
@@ -223,10 +287,10 @@ class cataloguesView extends StatelessWidget {
 class catalogInfoNoStateTest extends StatelessWidget {
   final Map item;
   catalogInfoNoStateTest(this.item);
-  Future <ninedotnineModel> _getActivityProdctList() async{
+  Future <ninedotnineListModel> _getActivityProdctList() async{
     Map query = {"appKey":prefix0.appkey,"version":"v1.1.0","pageSize":"20","pageId":"1","activityId":"${item["activityId"]}"};
     var rawData = await httpRequest().request(prefix0.cataProductpath, query);
-    ninedotnineModel model = ninedotnineModel.fromJson(rawData);
+    ninedotnineListModel model = ninedotnineListModel.fromJson(rawData);
     return model;
   }
  
@@ -236,9 +300,9 @@ class catalogInfoNoStateTest extends StatelessWidget {
       future: _getActivityProdctList(),
       builder: (context, snapshot){
         if (snapshot.hasData){
-          ninedotnineModel ndnmodel = snapshot.data as ninedotnineModel;
-          String imgUrl = fixImgUrl(item['goodsLabel']);
-          String imgdUrl = fixImgUrl(item['detailLabel']);
+          ninedotnineListModel ndnmodel = snapshot.data as ninedotnineListModel;
+          String imgUrl = item['goodsLabel'];
+          String imgdUrl = item['detailLabel'];
           print('单个活动热门');
           return Column(
             children: <Widget>[
@@ -247,10 +311,9 @@ class catalogInfoNoStateTest extends StatelessWidget {
                 padding: EdgeInsets.all(1),
                 child: Row(
                   children: <Widget>[
-                    
-                    Image.network(imgUrl,fit: BoxFit.fill,),
+                    returnImageWithUrl(imgUrl),
                     Expanded(
-                      child: Image.network(imgdUrl,fit:BoxFit.fill),
+                      child: returnImageWithUrl(imgdUrl),
                     )
                     
                   ],
@@ -310,12 +373,12 @@ class catalogTitleView extends StatelessWidget {
 }
 //单个活动商品展示
 class singleActivityProductView extends StatelessWidget {
-  final productInfo model;
+  final productInfoModel model;
   singleActivityProductView(this.model);
   @override
   Widget build(BuildContext context) {
     
-    String imgString = fixImgUrl(model.mainPic);
+    String imgString = model.mainPic;
     print('单个活动商品');
     return InkWell(
       
@@ -329,7 +392,7 @@ class singleActivityProductView extends StatelessWidget {
         child: Column(
           children: <Widget>[
             
-            Image.network(imgString),
+            returnImageWithUrl(imgString),
             Text(model.actualPrice.toString()),
             Text(model.originalPrice.toString(),style: TextStyle(decoration: TextDecoration.lineThrough,fontSize: 12,color: Colors.black12),),
           ],
@@ -349,40 +412,45 @@ class ndnTitle extends StatelessWidget {
   final String imgUrl = "https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2760302280,3837125440&fm=26&gp=0.jpg";
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Image.network(imgUrl,fit: BoxFit.fill,),
+    return Container(
+      padding: EdgeInsets.only(left: 13,right: 13),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: Image.network(imgUrl,fit: BoxFit.fill,),
+      )
     );
   }
 }
 //9.9商品列表
 class ndnProductList extends StatelessWidget {
-  List<productInfo> _dataList;
-  ndnProductList(this._dataList);
-  Widget _ndnProductCell(context,productInfo model){
-    String imgString = fixImgUrl(model.mainPic);
-    String monthSales = fixImgUrl(model.monthSales.toString());
+  List<productInfoModel> _dataList;
+  bool isHome;
+  BuildContext contextb;
+  ndnProductList(this._dataList,this.isHome,{this.contextb});
+  Widget _ndnProductCell(productInfoModel model,homeContext1){
+    String monthSales = model.monthSales.toString();
     if (monthSales.length > 3){
       monthSales = "${(model.monthSales/10000).toStringAsFixed(2)}万";
     }
     return Container(
       color: Colors.white,
-      height:  ssSetHeigth(340),
+      height:  ssSetHeigth(280),
       width:  ssSetWidth(750),
       child: InkWell(
         onTap: (){
-          Provide.value<ProductDetailProvider>(context).setProductModel(model.id.toString());
-          Application.router.navigateTo(homeContext, '/productDetailView?id=${model.id}',transition: TransitionType.inFromRight);
+          Provide.value<ProductDetailProvider>(homeContext1).setProductModel(model.id.toString());
+          Application.router.navigateTo(homeContext1, '/productDetailView?id=${model.id}',transition: TransitionType.inFromRight);
         },
         child: Row(
           children: <Widget>[
             ClipRRect(
               borderRadius: BorderRadius.circular(5),
               child: Container(
-                width: ssSetWidth(300),
-                height: ssSetHeigth(300),
-                padding: EdgeInsets.all(10),
+                width: ssSetHeigth(260),
+                height: ssSetHeigth(260),
+                padding: EdgeInsets.only(left: 20,top: 10,right: 10,bottom: 10),
                 margin: EdgeInsets.only(bottom: 0),
-                child: Image.network(imgString,fit: BoxFit.fill),
+                child: returnImageWithUrl(model.mainPic),
               ),
             ),
             Container(
@@ -390,15 +458,15 @@ class ndnProductList extends StatelessWidget {
                 children: <Widget>[
                   Container(
                     width: ssSetWidth(430),
-                    height: ssSetHeigth(160),
-                    margin: EdgeInsets.only(top: 20),
+                    height: ssSetHeigth(120),
+                    margin: EdgeInsets.only(top: 10,left: 20,right: 10,bottom: 10),
                     child: Text(model.dtitle,maxLines: 2,style: TextStyle(fontSize: 16),),
                   ),
                   Container(
                     margin: EdgeInsets.all(4),
                     width: ssSetWidth(430),
                     height: ssSetHeigth(38),
-                    child: Text('优惠价:¥${model.actualPrice}',style: TextStyle(color: Colors.pink,fontSize: 14),textAlign: TextAlign.left,),
+                    child: Text('优惠价:¥${model.actualPrice}',style: TextStyle(color: Colors.pink,fontSize: ssSp(28)),textAlign: TextAlign.left,),
                   ),
                   Container(
                     width: ssSetWidth(430),
@@ -408,7 +476,7 @@ class ndnProductList extends StatelessWidget {
                         Expanded(
                           child: Text('${model.shopType==0?"淘宝":"天猫"}价:¥${model.originalPrice}',style: TextStyle(decoration: TextDecoration.lineThrough,fontSize: 12,color: Colors.grey[600]),),
                         ),
-                        Text('已售$monthSales'),
+                        Text('已售$monthSales',style: TextStyle(fontSize: ssSp(22)),),
                       ],
                     ),
                   ),
@@ -416,7 +484,7 @@ class ndnProductList extends StatelessWidget {
                     height: ssSetHeigth(1),
                     width: ssSetWidth(430),
                     margin: EdgeInsets.only(top: 10),
-                    color: Colors.grey[200],
+                    color: Colors.grey[300],
                   )
                 ],
               ),
@@ -428,13 +496,24 @@ class ndnProductList extends StatelessWidget {
   }
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      physics: NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      itemCount: _dataList.length,
-      itemBuilder: (context,index){
-        return _ndnProductCell(context,_dataList[index]);
-      },
-    );
+    if (isHome) {
+      return ListView.builder(
+        physics: NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        itemCount: _dataList.length,
+        itemBuilder: (context,index){
+          return _ndnProductCell(_dataList[index],homeContext);
+        },
+      );
+    }else
+    {
+      return ListView.builder(
+        itemCount: _dataList.length,
+        itemBuilder: (context,index){
+          return _ndnProductCell(_dataList[index],contextb);
+        },
+      );
+    }
+    
   }
 }
