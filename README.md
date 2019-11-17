@@ -23,11 +23,11 @@
 
 今天主要更新内容:
 
-1.首页顶部appbar增加'自定义搜索框'
+1.首页顶部appbar增加自定义搜索框
 
-2.使用Fluro增加'路由'
+2.使用Fluro增加路由
 
-3.增加'商品详情页'(/home/productDetail文件夹)
+3.增加商品详情页(/home/productDetail文件夹)
 
 4.修复一些因数据缺失导致的BUG
 
